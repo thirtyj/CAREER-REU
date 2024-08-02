@@ -35,8 +35,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 - To answer this question, we would need to go through the data and identify what parasites are in their adult stage versus their larval stage. This would involve a bit of research into what the different (larval or adult) stages are present for each of the ones we have found. 
 
 # Methods
-We removed "one-off" species as defined by appearing less than five times across all species datasets and if the parasite also exists in its own group (e.g., We found four acanthacephalean species across four fish species, so acanths were removed because less than five were found and they exist in a seperate group from other parasites. e.g., TREM.META was kept because even though it only appeared once in the H. nuchalis dataset, it will be lumped in with the other trematode metacercaria data points.)
-
+- see code below for full explainations of how parasites were grouped and analyzed
 ### Rules for discriminating between adult and larval: 
 - by looking at our compiled parasite ID guides, we will designate all found parasites as either adult or larval on a case-by-case basis
 - For any parasite we have identified to a specific taxonomic level (family, genus, etc.), we will look at that life cycle in the literature and ID what stage we have. 
@@ -393,10 +392,19 @@ ggplot(mydf1, aes(x = x, y = predicted)) +
 
 #### Import dataset 
 - make sure you name all these new datasets and frames something different from what you named them above (that way we can still run all the analyses in total without losing any of the previous ones)
-```{r full dataset import, echo=FALSE}
+- JT Load Dataset
+```{r full dataset import JT, echo=FALSE, eval=FALSE}
 full.data <- read.csv("~/Desktop/UW/TUBRI/data/processed/Full_dataset_with_psite_life_history_info_2024.08.01.csv") %>% 
   janitor::clean_names()
+```
+- CW Load Dataset
+```{r full dataset import CW, echo=FALSE}
+full.data <- read.csv("~/Desktop/UW/TUBRI/data/processed/Full_dataset_with_psite_life_history_info_2024.08.01.csv") %>% 
+  janitor::clean_names()
+```
 
+- tidy up dataset variables
+```{r full dataset cleaning, echo=FALSE}
 full.data <- full.data %>%
   mutate(weight_mg = as.numeric(weight_mg)) %>% 
   mutate(weight_g = (weight_mg/1000)) %>% 
