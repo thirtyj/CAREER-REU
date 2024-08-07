@@ -383,13 +383,6 @@ ggplot(mydf1, aes(x = x, y = predicted)) +
 
 # Question 2
 
-## Modify datasets to refect only parasites that are able to occur in larval and adult stages in the host. 
-- we are doing this because in order to have a truly comparable dataset of parasites and their association with host body condition, we need to analyze parasites in a uniform way that does not skew the data one direction or another. For example, if you look at trematode parasites, both metacercaria and adult trematodes can live within a fish host. Now, compare that to monogenes who only occur as adults in the fish host. Because their larval stage will not occur in these fish hosts, by including them in our analyses we will be skewing the adult subset of parasites high. The monogenes have no larval counterpart in the fish, so they will always push the adult count higher. By removing monogenes from our analyses, we will have an even ground to compare larval and adult parasites. Therefore, parasites to __NOT__ include in our analyses are: 
-- monogenes
-- copepods
-- acanthocephalans
-- myxozoans
-
 #### Import dataset 
 - make sure you name all these new datasets and frames something different from what you named them above (that way we can still run all the analyses in total without losing any of the previous ones)
 - JT Load Dataset
@@ -531,6 +524,13 @@ ggplot(mydf, aes(x = x, y = predicted, color = group)) +
 # Question 3
 - Remove from the dataframe the parasites that can only occur as either an adult or a larvae in the host
 - contains option for what parasite taxon is present
+
+## Modify datasets to refect only parasites that are able to occur in larval and adult stages in the host. 
+- we are doing this because in order to have a truly comparable dataset of parasites and their association with host body condition, we need to analyze parasites in a uniform way that does not skew the data one direction or another. For example, if you look at trematode parasites, both metacercaria and adult trematodes can live within a fish host. Now, compare that to monogenes who only occur as adults in the fish host. Because their larval stage will not occur in these fish hosts, by including them in our analyses we will be skewing the adult subset of parasites high. The monogenes have no larval counterpart in the fish, so they will always push the adult count higher. By removing monogenes from our analyses, we will have an even ground to compare larval and adult parasites. Therefore, parasites to __NOT__ include in our analyses are: 
+- monogenes
+- copepods
+- acanthocephalans
+- myxozoans
 ```{r, eval=FALSE, echo=FALSE}
 full.data.taxon <- full.data %>%
   mutate(
