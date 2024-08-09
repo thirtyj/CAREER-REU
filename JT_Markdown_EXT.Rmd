@@ -135,6 +135,21 @@ H.nuchalis.data <- read_csv("~/Desktop/UW/TUBRI/data/processed/Hybognathus_nucha
   janitor::clean_names() %>%
   mutate(weight_mg = as.numeric(weight_mg)) %>% 
   mutate(weight_g = (weight_mg/1000))
+
+P.vigil.data <- read_csv("~/Desktop/UW/TUBRI/data/processed/Percina_vigil_processed_human_readable_UPDATED_2024.08.01.csv") %>%
+  janitor::clean_names() %>%
+  mutate(weight_mg = as.numeric(weight_mg)) %>% 
+  mutate(weight_g = (weight_mg/1000))
+
+C. velifer.data <- read_csv() %>%
+  janitor::clean_names() %>%
+  mutate(weight_mg = as.numeric(weight_mg)) %>% 
+  mutate(weight_g = (weight_mg/1000))
+
+G.affinis.data <- read_csv() %>%
+  janitor::clean_names() %>%
+  mutate(weight_mg = as.numeric(weight_mg)) %>% 
+  mutate(weight_g = (weight_mg/1000))
 ```
 
 # Question 1
@@ -303,6 +318,54 @@ H.nuchalis.data <- H.nuchalis.data %>%
                                       "larval"))) %>% 
   mutate(weight_g = (weight_mg/1000)) %>%
   janitor::clean_names()
+
+#### 
+P.vigil.data <- P.vigil.data %>%
+  mutate(larval = rowSums(select(., 
+                      "",
+                      ""))) %>%#
+  mutate(adult = rowSums(select(.,
+                     "",
+                     ""))) %>%
+  mutate(adult = as.integer(adult)) %>% 
+  mutate(larval = as.integer(larval)) %>%
+  mutate(psite_count = rowSums(select(.,
+                                      "adult", 
+                                      "larval"))) %>% 
+  mutate(weight_g = (weight_mg/1000)) %>%
+  janitor::clean_names()
+
+#### 
+C.velifer.data <- C.velifer.data %>%
+  mutate(larval = rowSums(select(., 
+                      "",
+                      ""))) %>%#
+  mutate(adult = rowSums(select(.,
+                     "",
+                     ""))) %>%
+  mutate(adult = as.integer(adult)) %>% 
+  mutate(larval = as.integer(larval)) %>%
+  mutate(psite_count = rowSums(select(.,
+                                      "adult", 
+                                      "larval"))) %>% 
+  mutate(weight_g = (weight_mg/1000)) %>%
+  janitor::clean_names()
+
+#### 
+G.affinis.data <- G.affinis.data %>%
+  mutate(larval = rowSums(select(., 
+                      "",
+                      ""))) %>%#
+  mutate(adult = rowSums(select(.,
+                     "",
+                     ""))) %>%
+  mutate(adult = as.integer(adult)) %>% 
+  mutate(larval = as.integer(larval)) %>%
+  mutate(psite_count = rowSums(select(.,
+                                      "adult", 
+                                      "larval"))) %>% 
+  mutate(weight_g = (weight_mg/1000)) %>%
+  janitor::clean_names()
 ```
 
 ## Calculating Fulton's Condition Factor
@@ -323,6 +386,18 @@ N.atherinoides.data.fcf <- N.atherinoides.data %>%
 H.nuchalis.data.fcf <- H.nuchalis.data %>%
   mutate(body_index_hybnuc = ((H.nuchalis.data$weight_g/((H.nuchalis.data$standard_length_mm)^3)))*(10^5)) %>%
   janitor::clean_names()
+
+P.vigil.data.fcf <- P.vigil.data %>%
+  mutate(body_index_pervig = ((P.vigil.data$weight_g/((P.vigil.data$standard_length_mm)^3)))*(10^5)) %>%
+  janitor::clean_names()
+
+C.velifer.data.fcf <- C.velifer.data %>%
+  mutate(body_index_carvel = ((C.velifer.data$weight_g/((C.velifer.data$standard_length_mm)^3)))*(10^5)) %>%
+  janitor::clean_names()
+
+G.affinis.data.fcf <- G.affinis.data %>%
+  mutate(body_index_gamaff = ((G.affinis.data$weight_g/((G.affinis.data$standard_length_mm)^3)))*(10^5)) %>%
+  janitor::clean_names()
 ```
 
 ## Model formula for Question 1 
@@ -341,6 +416,9 @@ summary(fcf_ictpun_lm <- lm(body_index_ictpun ~ psite_count + ci, data = I.punct
 summary(fcf_notath_lm <- lm(body_index_notath ~ psite_count + ci, data = N.atherinoides.data.fcf)) ### @ a = 0.1
 ## impact category is associated with an increase in fcf when accounting for total parasite count in notath
 summary(fcf_hybnuc_lm <- lm(body_index_hybnuc ~ psite_count + ci, data = H.nuchalis.data.fcf))
+summary(fcf_pervig_lm <- lm(body_pervig_hybnuc ~ psite_count + ci, data = P.vigil.data.fcf))
+summary(fcf_carvel_lm <- lm(body_index_carvel ~ psite_count + ci, data = C.velifer.data.fcf))
+summary(fcf_gamaff_lm <- lm(body_index_gamaff ~ psite_count + ci, data = G.affinis.data.fcf))
 ```
 
 - see how the models are fitting
