@@ -65,6 +65,7 @@ install.packages("tibble")
 install.packages("lmerTest")
 install.packages("DHARMa")
 install.packages("ggpmisc")
+install.packages("smatr")
 install.packages("scales")
 ```
 
@@ -76,6 +77,7 @@ library(lmerTest)
 library(emmeans)
 library(broom)
 library(ggpubr)
+library(smatr)
 library(stringr)
 library(caret)
 library(tibble)
@@ -146,10 +148,11 @@ C.velifer.data <- read_csv("~/Desktop/UW/TUBRI/data/processed/Carpiodes_velifer_
   mutate(weight_mg = as.numeric(weight_mg)) %>% 
   mutate(weight_g = (weight_mg/1000))
 
-G.affinis.data <- read_csv() %>%
-  janitor::clean_names() %>%
-  mutate(weight_mg = as.numeric(weight_mg)) %>% 
-  mutate(weight_g = (weight_mg/1000))
+
+#G.affinis.data <- read_csv() %>%
+ # janitor::clean_names() %>%
+  #mutate(weight_mg = as.numeric(weight_mg)) %>% 
+  #mutate(weight_g = (weight_mg/1000))
 ```
 
 # Question 1
@@ -374,25 +377,21 @@ C.velifer.data <- C.velifer.data %>%
                                       "larval"))) %>% 
   mutate(weight_g = (weight_mg/1000)) %>%
   janitor::clean_names()
-```
 
-
-```{r p.vig a/l stage, echo=FALSE, eval=FALSE}
-#### 
-G.affinis.data <- G.affinis.data %>%
-  mutate(larval = rowSums(select(., 
-                      "",
-                      ""))) %>%#
-  mutate(adult = rowSums(select(.,
-                     "",
-                     ""))) %>%
-  mutate(adult = as.integer(adult)) %>% 
-  mutate(larval = as.integer(larval)) %>%
-  mutate(psite_count = rowSums(select(.,
-                                      "adult", 
-                                      "larval"))) %>% 
-  mutate(weight_g = (weight_mg/1000)) %>%
-  janitor::clean_names()
+#G.affinis.data <- G.affinis.data %>%
+ # mutate(larval = rowSums(select(., 
+ #                     "",
+        #              ""))) %>%#
+# # mutate(adult = rowSums(select(.,
+  #                   "",
+  #                   ""))) %>%
+#  mutate(adult = as.integer(adult)) %>% 
+ # mutate(larval = as.integer(larval)) %>%
+ # mutate(psite_count = rowSums(select(.,
+                                   #   "adult", 
+                                 #     "larval"))) %>% 
+#  mutate(weight_g = (weight_mg/1000)) %>%
+ # janitor::clean_names()
 ```
 
 ## Calculating Fulton's Condition Factor
@@ -429,60 +428,99 @@ C.velifer.data.fcf <- C.velifer.data %>%
 
 ## Create new columns for calculating condition factor
 ```{r columns, echo=FALSE}
+
 P.vigilax.data.smi <- P.vigilax.data %>%
   mutate(log_weight = log(weight_g)) %>%
-  mutate(log_standard_length = log(standard_length_mm)) %>% 
-  mutate(b_smi = (log_weight - log_standard_length)) %>% 
-  mutate(avg_weight = ave(weight_g, FUN = mean)) %>%
+  mutate(log_standard_length = log(standard_length_mm)) %>%
   janitor::clean_names()
 
 I.punctatus.data.smi <- I.punctatus.data %>%
   mutate(log_weight = log(weight_g)) %>%
   mutate(log_standard_length = log(standard_length_mm)) %>% 
-  mutate(b_smi = (log_weight - log_standard_length)) %>% 
-  mutate(avg_weight = ave(weight_g, FUN = mean)) %>%
+  mutate(b_smi = (log_weight - log_standard_length)) %>%
   janitor::clean_names()
 
 N.atherinoides.data.smi <- N.atherinoides.data %>%
   mutate(log_weight = log(weight_g)) %>%
   mutate(log_standard_length = log(standard_length_mm)) %>% 
-  mutate(b_smi = (log_weight - log_standard_length)) %>% 
-  mutate(avg_weight = ave(weight_g, FUN = mean)) %>%
+  mutate(b_smi = (log_weight - log_standard_length)) %>%
   janitor::clean_names()
 
 H.nuchalis.data.smi <- H.nuchalis.data %>%
   mutate(log_weight = log(weight_g)) %>%
   mutate(log_standard_length = log(standard_length_mm)) %>% 
-  mutate(b_smi = (log_weight - log_standard_length)) %>% 
-  mutate(avg_weight = ave(weight_g, FUN = mean)) %>%
+  mutate(b_smi = (log_weight - log_standard_length)) %>%
   janitor::clean_names()
 
 P.vigil.data.smi <- P.vigil.data %>%
   mutate(log_weight = log(weight_g)) %>%
   mutate(log_standard_length = log(standard_length_mm)) %>% 
-  mutate(b_smi = (log_weight - log_standard_length)) %>% 
-  mutate(avg_weight = ave(weight_g, FUN = mean)) %>%
+  mutate(b_smi = (log_weight - log_standard_length)) %>%
   janitor::clean_names()
 
 C.velifer.data.smi <- C.velifer.data %>%
   mutate(log_weight = log(weight_g)) %>%
   mutate(log_standard_length = log(standard_length_mm)) %>% 
-  mutate(b_smi = (log_weight - log_standard_length)) %>% 
-  mutate(avg_weight = ave(weight_g, FUN = mean)) %>%
+  mutate(b_smi = (log_weight - log_standard_length)) %>%
   janitor::clean_names()
+
+#G.affinis.data.smi <- G.affinis.data %>%
+ # mutate(log_weight = log(weight_g)) %>%
+#  mutate(log_standard_length = log(standard_length_mm)) %>% 
+ # mutate(b_smi = (log_weight - log_standard_length)) %>%
+ # janitor::clean_names()
+
+```
+
+## get scaling exponent
+```{r add scaling code, echo=FALSE}
+
+pimvig_m <- lm(log_weight ~ log_standard_length, data = P.vigilax.data.smi)
+pimvig_c <- tidy(pimvig_m)
+pimvig_s <- pimvig_c %>%
+  filter(term == "log_standard_length") %>%
+  pull(estimate)
+
+ictpun_m <- lm(log_weight ~ log_standard_length, data = I.punctatus.data.smi)
+ictpun_c <- tidy(ictpun_m)
+ictpun_s <- ictpun_c %>%
+  filter(term == "log_standard_length") %>%
+  pull(estimate)
+
+notath_m <- lm(log_weight ~ log_standard_length, data = N.atherinoides.data.smi)
+notath_c <- tidy(notath_m)
+notath_s <- notath_c %>%
+  filter(term == "log_standard_length") %>%
+  pull(estimate)
+
+hybnuc_m <- lm(log_weight ~ log_standard_length, data = H.nuchalis.data.smi)
+hybnuc_c <- tidy(hybnuc_m)
+hybnuc_s <- hybnuc_c %>%
+  filter(term == "log_standard_length") %>%
+  pull(estimate)
+
+pervig_m <- lm(log_weight ~ log_standard_length, data = P.vigilax.data.smi)
+pervig_c <- tidy(pervig_m)
+pervig_s <- pervig_c %>%
+  filter(term == "log_standard_length") %>%
+  pull(estimate)
+
+carvel_m <- lm(log_weight ~ log_standard_length, data = C.velifer.data.smi)
+carvel_c <- tidy(carvel_m)
+carvel_s <- carvel_c %>%
+  filter(term == "log_standard_length") %>%
+  pull(estimate)
+
+#gamaff_m <- lm(log_weight ~ log_standard_length, data = G.affinis.data.smi)
+#gamaff_c <- tidy(gamaff_m)
+#gamaff_s <- gamaff_c %>%
+ # filter(term == "log_standard_length") %>%
+#  pull(estimate)
+
+
 ```
 
 
-```{r columns, echo=FALSE, eval=FALSE}
-G.affinis.data.smi <- G.affinis.data %>%
-  mutate(log_weight = log(weight_g)) %>%
-  mutate(log_standard_length = log(standard_length_mm)) %>% 
-  mutate(b_smi = (log_weight - log_standard_length)) %>% 
-  mutate(avg_weight = ave(weight_g, FUN = mean)) %>%
-  janitor::clean_names()
-
-
-```
 
 ## Find average weight for all pooled samples (per species)
 ```{r, averages, echo=FALSE}
@@ -501,34 +539,33 @@ carvel_avg_w <- mean(C.velifer.data$weight_g, na.rm = TRUE)
 ```{r, SMI q1, echo=FALSE}
 
 P.vigilax.data.smi <- P.vigilax.data.smi %>%
-  mutate(smi_pimvig = weight_g*(pimvig_avg_w / standard_length_mm) ^ b_smi) %>%
+  mutate(smi_pimvig = weight_g*(pimvig_avg_w / standard_length_mm) ^ pimvig_s) %>%
   janitor::clean_names()
 
 I.punctatus.data.smi <- I.punctatus.data.smi %>%
-  mutate(smi_ictpun = weight_g*(ictpun_avg_w / standard_length_mm) ^ b_smi) %>%
+  mutate(smi_ictpun = weight_g*(ictpun_avg_w / standard_length_mm) ^ ictpun_s) %>%
   janitor::clean_names()
 
 N.atherinoides.data.smi <- N.atherinoides.data.smi %>%
-  mutate(smi_notath = weight_g*(notath_avg_w / standard_length_mm) ^ b_smi) %>%
+  mutate(smi_notath = weight_g*(notath_avg_w / standard_length_mm) ^ notath_s) %>%
   janitor::clean_names()
 
 H.nuchalis.data.smi <- H.nuchalis.data.smi %>%
-  mutate(smi_hybnuc = weight_g*(hybnuc_avg_w / standard_length_mm) ^ b_smi) %>%
+  mutate(smi_hybnuc = weight_g*(hybnuc_avg_w / standard_length_mm) ^ hybnuc_s) %>%
   janitor::clean_names()
 
 P.vigil.data.smi <- P.vigil.data.smi %>%
-  mutate(smi_pervig = weight_g*(pervig_avg_w / standard_length_mm) ^ b_smi) %>%
+  mutate(smi_pervig = weight_g*(pervig_avg_w / standard_length_mm) ^ pervig_s) %>%
   janitor::clean_names()
 
 C.velifer.data.smi <- C.velifer.data.smi %>%
-  mutate(smi_carvel = weight_g*(carvel_avg_w / standard_length_mm) ^ b_smi) %>%
+  mutate(smi_carvel = weight_g*(carvel_avg_w / standard_length_mm) ^ carvel_s) %>%
   janitor::clean_names()
 
 #G.affinis.data.smi <- G.affinis.data.smi %>%
- # mutate(smi_gamaff = weight_g*(gamaff_avg_w / standard_length_mm) ^ b_smi) %>%
+ # mutate(smi_gamaff = weight_g*(gamaff_avg_w / standard_length_mm) ^ gamaff_s) %>%
  # janitor::clean_names()
 ```
-
 
 
 ## Model formula for Question 1 
@@ -554,11 +591,11 @@ summary(fcf_carvel_lm <- lm(body_index_carvel ~ psite_count + ci, data = C.velif
 
 ## Models for SMI 
 ```{r smi models}
-summary(smi_pimvig_lm <- lm(smi_pimvig ~ psite_count + ci, data = P.vigilax.data.smi))
+summary(smi_pimvig_lm <- lm(smi_pimvig ~ psite_count + ci, data = P.vigilax.data.smi)) 
 summary(smi_ictpun_lm <- lm(smi_ictpun ~ psite_count + ci, data = I.punctatus.data.smi))
 summary(smi_notath_lm <- lm(smi_notath ~ psite_count + ci, data = N.atherinoides.data.smi)) 
 summary(smi_hybnuc_lm <- lm(smi_hybnuc ~ psite_count + ci, data = H.nuchalis.data.smi))
-summary(smi_pervig_lm <- lm(smi_pervig ~ psite_count + ci, data = P.vigil.data.smi))
+summary(smi_pervig_lm <- lm(smi_pervig ~ psite_count + ci, data = P.vigil.data.smi)) ###
 summary(smi_carvel_lm <- lm(smi_carvel ~ psite_count + ci, data = C.velifer.data.smi))
 #summary(smi_gamaff_lm <- lm(body_index_gamaff ~ psite_count + ci, data = G.affinis.data.smi))
 ```
@@ -597,7 +634,7 @@ ggplot(mydf1, aes(x = x, y = predicted)) +
 
 #### using smi
 # Generate predictions
-mydf2 <- ggpredict(smi_pimvig_lm, terms = c("ci"))
+mydf2 <- ggpredict(smi_pervig_lm, terms = c("ci"))
 
 # Define the theme
 apatheme <- theme_bw(base_size = 11, base_family = "sans") +
@@ -648,6 +685,7 @@ full.data <- full.data %>%
 ```
 
 ## Categorize parasites as either adult or larval. All found parasites are included in these analyses (only for the fish species listed). Add back a column for Fulton's Condition Factor. 
+#### for the first question
 ```{r add stages to total, echo=FALSE}
 full.data.stages <- full.data %>%
   mutate(
@@ -675,7 +713,7 @@ full.data.stages <- full.data %>%
                          "TREM.DIPLO", "TREM.UNK", "CEST.UNK", "MONO.DACT",
                          "MONO.GDAC", "ACAN.AD", "COPE.POOD", "CEST.WS", "CEST.MEAGAN", "CEST.TRI",
                          "CEST.ARCH", "CEST.UNKA", "COPE.HNY", "NEM.CERL", "NEM.UNK", "TREM.SEP", "TREM.ORS", "TREM.CV", 
-                         "MONO.NID", "NEM.HEATH", "MEN.SQUIG", "ACANTH.BB",, "TREM.PHLB",
+                         "MONO.NID", "NEM.HEATH", "MEN.SQUIG", "ACANTH.BB", "TREM.PHLB",
                          "CEST.BOT", "MONO.GYRO") ~ "adult",
       
       psite_spp_x %in% c("META.HS", "META.UNK", "MYX.GO", "MYX.GEOM",
@@ -717,6 +755,28 @@ full.data.stages <- full.data.stages %>%
 ## New formula for calculating the condition factor for the total dataset
 ```{r, SMI, echo=FALSE}
 
+
+full.data.smi <- full.data.stages %>%
+  mutate(log_weight = log(weight_g)) %>%
+  mutate(log_standard_length = log(standard_length_mm)) %>%
+  janitor::clean_names()
+
+full_data_m <- lm(log_weight ~ log_standard_length, data = full.data.smi)
+full_data_c <- tidy(full_data_m)
+full_data_s <- full_data_c %>%
+  filter(term == "log_standard_length") %>%
+  pull(estimate)
+
+
+full.data.smi <- full.data.smi %>%
+  group_by(fish_sp_x) %>%
+  mutate(avg_weight = mean(weight_g, na.rm = TRUE)) %>%
+  ungroup()
+
+full.data.smi <- full.data.smi %>%
+  mutate(smi = weight_g*(avg_weight / standard_length_mm) ^ full_data_s) %>%
+  janitor::clean_names()
+
 ```
 
 
@@ -745,6 +805,17 @@ vif(q2m)
 s2=simulateResiduals(fittedModel=q2m,n=250)
 plot(s2)
 
+### with new smi
+# run the model
+summary(q2m_smi <- lmer(smi ~ life_stage + psite_count + ci + (1|fish_sp_x)+ (1|catalog_number), data = full.data.smi))
+
+# check co-linearity using vif function --> GVIF^(1/(2*Df)) under 5 is acceptable generally
+vif(q2m_smi)
+
+# check how the model fits
+s2_smi=simulateResiduals(fittedModel=q2m,n=250)
+plot(s2_smi)
+
 ```
 
 ## Generate model predictions and plot
@@ -769,6 +840,29 @@ ggplot(mydf, aes(x = x, y = predicted, color = group)) +
   annotate("text", x = Inf, y = Inf, label = paste("p-value control vs. impact catergory: ", format(p_value_ciimpact, scientific = TRUE)),
            hjust = 1.5, vjust = 1.5, size = 4, color = "black") +
   apatheme
+
+#### for new smi
+# Generate predictions
+mydf_smi <- ggpredict(q2m_smi, terms = c("ci", "life_stage"))
+
+# Define the theme
+apatheme_smi <- theme_bw(base_size = 11, base_family = "sans") +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        axis.line = element_line())
+
+# Extracted values
+p_value_ciimpact_smi <- 0.008166  # Example value; replace with actual extracted value
+
+# Create the plot with annotations
+ggplot(mydf_smi, aes(x = x, y = predicted, color = group)) + 
+  geom_point(alpha = 0.6, size = 2) +
+  labs(x = 'Category', y = 'Predicted K', title = NULL) +
+  annotate("text", x = Inf, y = Inf, label = paste("p-value control vs. impact catergory: ", format(p_value_ciimpact_smi, scientific = TRUE)),
+           hjust = 1.5, vjust = 1.5, size = 4, color = "black") +
+  apatheme_smi
+
 ```
 
 ## Discussion
