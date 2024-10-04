@@ -117,6 +117,29 @@ H.nuchalis.data <- read_csv("data/processed/Hybognathus_nuchalis_processed_human
   mutate(weight_g = (weight_mg/1000))
 ```
 
+```{r JT datasets, echo=TRUE}
+P.vigilax.data <- read.csv("C:/Users/thirt/Desktop/SuPeR Parasites/data/processed/Percina_vigil_processed_human_readable_UPDATED_2024.08.01.csv") %>% janitor::clean_names() %>%
+  mutate(weight_mg = as.numeric(weight_mg)) %>% 
+  mutate(weight_g = (weight_mg/1000))
+
+I.punctatus.data <- read.csv("C:/Users/thirt/Desktop/SuPeR Parasites/data/processed/Ictalurus_punctatus_processed_human_readable.csv_UPDATED_2024.08.01.csv")  %>%
+  janitor::clean_names() %>%
+  mutate(day_collected = as.integer(day_collected)) %>%
+  mutate(weight_mg = as.numeric(weight_mg))%>% 
+  mutate(weight_g = (weight_mg/1000))
+
+N.atherinoides.data <- read.csv("C:/Users/thirt/Desktop/SuPeR Parasites/data/processed/Notropis_atherinoides_processed_human_readable_UPDATED_2024.08.01.csv") %>% 
+  janitor::clean_names() %>%
+  mutate(weight_mg = as.numeric(weight_mg)) %>% 
+  mutate(weight_g = (weight_mg/1000))
+
+H.nuchalis.data <- read_csv("C:/Users/thirt/Desktop/SuPeR Parasites/data/processed/Hybognathus_nuchalis_processed_human_readable_UPDATED_2024.08.01.csv") %>%
+  janitor::clean_names() %>%
+  mutate(weight_mg = as.numeric(weight_mg)) %>% 
+  mutate(weight_g = (weight_mg/1000))
+```
+
+
 # Question 1
 ### Giving adult and larval IDs so we can look at life stage compared to total parasite burden (for answering question 1). Create a column in each dataset for weight in grams
 - add columns to identify species as an adult or larval stage and new column for total parasite count
